@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Barbearia do Carioca</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
+
+  <link rel="icon" type="image/png" href="download-removebg-preview.png" />
+  <link rel="stylesheet" href="style.css?v=20260226" />
+</head>
+<body>
+  <!-- Topo -->
+  <header class="top">
+    <h1 class="brand">BARBEARIA DO CARIOCA</h1>
+
+    <nav class="nav">
+      <button class="nav-btn is-active" data-tab="inicio">INÍCIO</button>
+      <button class="nav-btn" data-tab="agendar">AGENDAR</button>
+      <button class="nav-btn" data-tab="galeria">GALERIA</button>
+      <button class="nav-btn" data-tab="precos">PREÇOS</button>
+      <button class="nav-btn" data-tab="assinaturas">ASSINATURAS</button>
+    </nav>
+  </header>
+
+  <div class="divider"></div>
+
+  <main class="container">
+    <!-- INÍCIO -->
+    <section class="panel is-show" id="inicio">
+      <div class="box hero">
+        <div class="logo-wrap">
+          <div class="logo" id="adminLogo">
+            <img class="logo-img" src="download-removebg-preview.png" alt="Logo Barbearia do Carioca" />
+          </div>
+        </div>
+
+        <h2 class="hero-title">BEM-VINDO À BARBEARIA DO CARIOCA</h2>
+        <p class="hero-sub">
+          Cortes profissionais, ambiente acolhedor e o melhor atendimento de Goiânia.
+          Agende seu horário!
+        </p>
+      </div>
+
+      <div class="box">
+        <h3 class="section-title">Redes Sociais</h3>
+        <p class="muted">Veja nossos cortes e agende seu horário.</p>
+
+        <div class="socials">
+          <a class="social-card instagram" target="_blank" rel="noopener" href="https://www.instagram.com/barbearia_do.carioca/">
+            <span class="social-ico" aria-hidden="true"><i class="fa-brands fa-instagram"></i></span>
+            <span class="social-text">
+              <span class="social-title">Instagram</span>
+              <span class="social-desc">Fotos e trabalhos</span>
+            </span>
+          </a>
+          <a class="social-card whatsapp" target="_blank" rel="noopener" href="https://wa.me/556297003093">
+            <span class="social-ico" aria-hidden="true"><i class="fa-brands fa-whatsapp"></i></span>
+            <span class="social-text">
+              <span class="social-title">WhatsApp</span>
+              <span class="social-desc">Atendimento e agendamento</span>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <div class="box">
+        <h3 class="section-title"><span class="pin">📍</span> Nossa Localização</h3>
+        <p class="muted">
+          Endereço: Av. Maurício Gomes Ribeiro - Vila Novo Horizonte, Goiânia - GO, 74363-800
+        </p>
+
+        <div class="actions">
+          <a class="btn primary" target="_blank" rel="noopener"
+             href="https://maps.app.goo.gl/sztj24s9ERGbqs7m8">
+            ABRIR NO GOOGLE MAPS
+          </a>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- AGENDAR -->
+    <section class="panel" id="agendar">
+      <div class="box">
+        <h3 class="section-title">Agendar Horário</h3>
+        <p class="muted">Escolha a data e o horário. Se estiver ocupado, o horário ficará indisponível.</p>
+
+        <div class="scheduler">
+          <div>
+            <label class="field">
+              <span>Nome</span>
+              <input id="bookName" type="text" placeholder="Seu nome" maxlength="50" />
+            </label>
+            <label class="field">
+              <span>WhatsApp</span>
+              <input id="bookPhone" type="tel" inputmode="numeric" pattern="[0-9]*" autocomplete="tel" placeholder="(00) 00000-0000" maxlength="20" />
+            </label>
+            <div class="field" id="bookServicesWrap">
+              <span>Serviços</span>
+              <div id="bookServicesList">
+                <div class="book-service-row" style="display: flex; gap: 5px; margin-bottom: 5px;">
+                  <select class="bookServiceSelect" style="flex: 1;"></select>
+                  <button class="icon-btn remove-book-service-btn" type="button" style="display:none;" title="Remover"><i class="fa fa-trash"></i></button>
+                </div>
+              </div>
+              <button class="btn small" type="button" id="addBookServiceBtn" style="margin-top: 5px; width: fit-content;">+ Adicionar outro serviço</button>
+            </div>
+            <div class="row">
+              <label class="field">
+                <span>Data</span>
+                <input id="bookDate" type="date" />
+              </label>
+              <label class="field">
+                <span>Horário</span>
+                <select id="bookTime"></select>
+              </label>
+            </div>
+            <button class="btn primary" id="bookBtn">CONFIRMAR AGENDAMENTO</button>
+            <p id="bookMsg" class="tiny muted"></p>
+          </div>
+
+          <div class="preview-box">
+            <div class="mini-calendar">
+              <div class="mini-cal-head">
+                <button class="btn small" id="clientCalPrev">◀</button>
+                <div class="mini-cal-label" id="clientCalLabel">Mês</div>
+                <button class="btn small" id="clientCalNext">▶</button>
+              </div>
+              <div class="calendar-grid" id="clientCalendarGrid"></div>
+              <div class="tiny muted">Clique em um dia para escolher a data.</div>
+            </div>
+
+            <div class="muted">Horários disponíveis</div>
+            <div id="slotsGrid" class="slots"></div>
+          </div>
+        </div>
+      </div>
+      </div>
+      </div>
+      </div>
+    </section>
+
+    <!-- GALERIA -->
+    <section class="panel" id="galeria">
+      <div class="box">
+        <h3 class="section-title">Galeria</h3>
+        <p class="muted">Confira alguns dos nossos cortes.</p>
+
+        <div id="galleryGrid" class="grid"></div>
+        <p id="galleryEmpty" class="empty">Nenhuma foto ainda. Adicione em <b>Galeria</b> no painel.</p>
+      </div>
+    </section>
+
+    <!-- PREÇOS -->
+    <section class="panel" id="precos">
+      <div class="box">
+        <h3 class="section-title">Preços</h3>
+        <p class="muted">Veja nossos serviços e valores.</p>
+
+        <div id="pricesList" class="prices"></div>
+        <p id="pricesEmpty" class="empty">Nenhum serviço cadastrado. Adicione em <b>Preços</b> no painel.</p>
+      </div>
+    </section>
+
+    <!-- ASSINATURAS -->
+    <section class="panel" id="assinaturas">
+      <div class="box">
+        <h3 class="section-title">Assinaturas Mensais</h3>
+        <p class="muted">Escolha o plano ideal e assine em poucos cliques.</p>
+
+        <div id="plansGrid" class="plans"></div>
+        <p id="plansEmpty" class="empty">Nenhum plano cadastrado. Adicione em <b>Planos</b> no painel.</p>
+      </div>
+    </section>
+
+    <!-- ADMIN -->
+    <section class="panel" id="admin">
+      <div class="box">
+        <div class="admin-top">
+          <div>
+            <h3 class="section-title">Painel do Admin</h3>
+            <p class="muted">Acesso restrito. Aqui você gerencia clientes, estoque, comissão, preços, galeria e caixa.</p>
+          </div>
+          <button class="btn" id="logoutBtn">SAIR</button>
+        </div>
+
+        <div class="admin-grid">
+            <button class="admin-card" data-admin="clientes">
+              <div class="admin-ico">👤</div>
+              <div>
+                <div class="admin-title">Cadastro de Cliente</div>
+                <div class="admin-sub">Adicionar / listar clientes</div>
+              </div>
+            </button>
+
+            <button class="admin-card" data-admin="estoque">
+              <div class="admin-ico">📦</div>
+              <div>
+                <div class="admin-title">Estoque</div>
+                <div class="admin-sub">Produtos e quantidades</div>
+              </div>
+            </button>
+
+            <button class="admin-card" data-admin="comissao">
+              <div class="admin-ico">💰</div>
+              <div>
+                <div class="admin-title">Comissão</div>
+                <div class="admin-sub">Profissionais e cortes</div>
+              </div>
+            </button>
+
+            <button class="admin-card" data-admin="precosAdmin">
+              <div class="admin-ico">🏷️</div>
+              <div>
+                <div class="admin-title">Alterar Preços</div>
+                <div class="admin-sub">Serviços e valores</div>
+              </div>
+            </button>
+
+            <button class="admin-card" data-admin="galeriaAdmin">
+              <div class="admin-ico">🖼️</div>
+              <div>
+                <div class="admin-title">Galeria de Fotos</div>
+                <div class="admin-sub">Adicionar / remover fotos</div>
+              </div>
+            </button>
+
+            <button class="admin-card" data-admin="agendamentos">
+              <div class="admin-ico">📅</div>
+              <div>
+                <div class="admin-title">Agendamentos</div>
+                <div class="admin-sub">Calendário e bloqueios</div>
+              </div>
+            </button>
+
+            <button class="admin-card" data-admin="assinantes">
+              <div class="admin-ico">⭐</div>
+              <div>
+                <div class="admin-title">Assinantes</div>
+                <div class="admin-sub">Planos e cortes do mês</div>
+              </div>
+            </button>
+
+            <button class="admin-card" data-admin="planos">
+              <div class="admin-ico">🧾</div>
+              <div>
+                <div class="admin-title">Planos</div>
+                <div class="admin-sub">Preços e descrições</div>
+              </div>
+            </button>
+
+            <button class="admin-card" data-admin="finance">
+              <div class="admin-ico">📊</div>
+              <div>
+                <div class="admin-title">Controle de Caixa</div>
+                <div class="admin-sub">Entradas e gastos por mês</div>
+              </div>
+            </button>
+          </div>
+
+        <div class="admin-panels">
+            <div class="admin-panel" id="admin_clientes">
+            <h4>Cadastro de Cliente</h4>
+            <div class="form2">
+              <label class="field">
+                <span>Nome</span>
+                <input id="cName" type="text" placeholder="Nome do cliente" maxlength="50" />
+              </label>
+              <label class="field">
+                <span>Telefone</span>
+                <input id="cPhone" type="tel" inputmode="numeric" pattern="[0-9]*" autocomplete="tel" placeholder="(00) 00000-0000" maxlength="20" />
+              </label>
+              <button class="btn primary" id="addClientBtn">ADICIONAR</button>
+            </div>
+
+            <div class="table">
+              <div class="t-head">
+                <span>Nome</span><span>Telefone</span><span>Ações</span>
+              </div>
+              <div id="clientsTable" class="t-body"></div>
+            </div>
+          </div>
+
+          <div class="admin-panel" id="admin_estoque">
+            <h4>Estoque</h4>
+            <div class="form2">
+              <label class="field">
+                <span>Produto</span>
+                <input id="pName" type="text" placeholder="Ex: Pomada" maxlength="50" />
+              </label>
+              <label class="field">
+                <span>Quantidade</span>
+                <input id="pQty" type="number" min="0" placeholder="0" />
+              </label>
+              <button class="btn primary" id="addProductBtn">ADICIONAR</button>
+            </div>
+
+            <div class="table">
+              <div class="t-head">
+                <span>Produto</span><span>Qtd</span><span>Ações</span>
+              </div>
+              <div id="stockTable" class="t-body"></div>
+            </div>
+          </div>
+          <div class="admin-panel" id="admin_comissao">
+            <h4>Comissão</h4>
+            <p class="muted">Cadastre os profissionais, lance os cortes e veja a comissão.</p>
+
+            <h5>Lançar cortes</h5>
+            <div class="form3">
+              <label class="field">
+                <span>Profissional</span>
+                <select id="cutBarber"></select>
+              </label>
+              <div class="field" id="cutServicesWrap">
+                <span>Serviços</span>
+                <div id="cutServicesList">
+                  <div class="cut-service-row" style="display: flex; gap: 5px; margin-bottom: 5px;">
+                    <select class="cutServiceSelect" style="flex: 1;"></select>
+                    <button class="icon-btn remove-cut-service-btn" type="button" style="display:none;" title="Remover"><i class="fa fa-trash"></i></button>
+                  </div>
+                </div>
+                <button class="btn small" type="button" id="addCutServiceBtn" style="margin-top: 5px; width: fit-content;">+ Adicionar serviço</button>
+              </div>
+              <label class="field">
+                <span>Qtd</span>
+                <input id="cutQty" type="number" min="1" step="1" placeholder="1" />
+              </label>
+              <label class="field">
+                <span>Data</span>
+                <input id="cutDate" type="date" />
+              </label>
+              <button class="btn primary" id="addCutBtn">LANÇAR</button>
+            </div>
+
+            <div class="section-card" id="commissionReportCard">
+              <button class="section-toggle" id="commissionReportToggle" type="button" aria-expanded="false" aria-controls="commissionReportBody">
+                <span>Relatório mensal</span>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <div class="collapse" id="commissionReportBody" aria-hidden="true">
+                <div class="form2">
+                  <label class="field">
+                    <span>Mês</span>
+                    <input id="commissionMonth" type="month" />
+                  </label>
+                  <button class="btn primary" id="commissionMonthBtn">GERAR</button>
+                </div>
+
+                <div class="box mini">
+                  <div class="result-line">
+                    <span>Total de cortes no mês:</span>
+                    <b id="monthCutsTotalQty">0</b>
+                  </div>
+                  <div class="result-line">
+                    <span>Comissão do mês:</span>
+                    <b id="monthCutsTotalCommission">R$ 0,00</b>
+                  </div>
+                </div>
+
+                <div class="table cols-3">
+                  <div class="t-head">
+                    <span>Profissional</span><span>Cortes (mês)</span><span>Comissão (mês)</span>
+                  </div>
+                  <div id="commissionMonthSummary" class="t-body"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card" id="commissionBarbersCard">
+              <button class="section-toggle" id="commissionBarbersToggle" type="button" aria-expanded="false" aria-controls="commissionBarbersBody">
+                <span>Profissionais</span>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <div class="collapse" id="commissionBarbersBody" aria-hidden="true">
+                <div class="form2">
+                  <label class="field">
+                    <span>Nome</span>
+                    <input id="bName" type="text" placeholder="Nome do profissional" maxlength="50" />
+                  </label>
+                  <label class="field">
+                    <span>% Comissão</span>
+                    <input id="bPercent" type="number" min="0" max="100" step="1" placeholder="Ex: 40" />
+                  </label>
+                  <button class="btn primary" id="addBarberBtn">ADICIONAR</button>
+                </div>
+
+                <div class="table">
+                  <div class="t-head">
+                    <span>Profissional</span><span>%</span><span>Ações</span>
+                  </div>
+                  <div id="barbersTable" class="t-body"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card" id="commissionCutsListCard">
+              <button class="section-toggle" id="commissionCutsListToggle" type="button" aria-expanded="false" aria-controls="commissionCutsListBody">
+                <span>Cortes lançados</span>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <div class="collapse" id="commissionCutsListBody" aria-hidden="true">
+                <div class="table cols-5 scroll">
+                  <div class="t-head">
+                    <span>Profissional</span><span>Serviço</span><span>Qtd</span><span>Comissão</span><span>Ações</span>
+                  </div>
+                  <div id="cutsTable" class="t-body"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="admin-panel" id="admin_precosAdmin">
+            <h4>Alterar Preços</h4>
+
+            <div class="form2">
+              <label class="field">
+                <span>Serviço</span>
+                <input id="sName" type="text" placeholder="Ex: Corte" maxlength="50" />
+              </label>
+              <label class="field">
+                <span>Preço (R$)</span>
+                <input id="sPrice" type="number" min="0" step="0.01" placeholder="Ex: 35.00" />
+              </label>
+              <button class="btn primary" id="addServiceBtn">ADICIONAR</button>
+            </div>
+
+            <div class="table">
+              <div class="t-head">
+                <span>Serviço</span><span>Preço</span><span>Ações</span>
+              </div>
+              <div id="servicesTable" class="t-body"></div>
+            </div>
+          </div>
+
+          <div class="admin-panel" id="admin_galeriaAdmin">
+            <h4>Galeria de Fotos</h4>
+            <p class="muted">Adicione por URL ou arquivo do computador.</p>
+
+            <div class="form2">
+              <label class="field">
+                <span>URL da imagem</span>
+                <input id="gUrl" type="url" placeholder="https://..." />
+              </label>
+              <button class="btn primary" id="addPhotoBtn">ADICIONAR URL</button>
+            </div>
+
+            <div class="form2">
+              <label class="field">
+                <span>Arquivo</span>
+                <input id="gFile" type="file" accept="image/*" />
+              </label>
+              <button class="btn primary" id="addPhotoFileBtn">ADICIONAR ARQUIVO</button>
+            </div>
+
+            <div class="grid" id="adminGalleryGrid"></div>
+            <p class="tiny muted">Dica: imagens grandes podem pesar no armazenamento do navegador.</p>
+          </div>
+
+          <div class="admin-panel" id="admin_agendamentos">
+            <h4>Agendamentos</h4>
+            <p class="muted">Veja os horários marcados, bloqueie datas e bloqueie horários.</p>
+
+            <div class="admin-calendar">
+              <div class="calendar-head">
+                <button class="btn" id="calPrev">MÊS ANTERIOR</button>
+                <div>
+                  <div class="section-title" id="calLabel">Mês</div>
+                  <div class="tiny muted">Clique em um dia para filtrar os agendamentos.</div>
+                </div>
+                <button class="btn" id="calNext">PRÓXIMO MÊS</button>
+              </div>
+              <div class="calendar-grid" id="adminCalendarGrid"></div>
+              <div class="calendar-legend">
+                <span class="legend-item"><span class="legend-box is-booked"></span>Com agendamentos</span>
+                <span class="legend-item"><span class="legend-box is-blocked"></span>Bloqueado</span>
+                <span class="legend-item"><span class="legend-box is-today"></span>Hoje</span>
+              </div>
+            </div>
+
+            <div class="form2">
+              <label class="field">
+                <span>Filtrar por data</span>
+                <input id="adminBookDate" type="date" />
+              </label>
+              <button class="btn" id="adminTodayBtn">HOJE</button>
+            </div>
+
+            <div class="table cols-6 scroll admin-bookings-table">
+              <div class="t-head">
+                <span>Data</span><span>Hora</span><span>Cliente</span><span>Serviço</span><span>WhatsApp</span><span>Ações</span>
+              </div>
+              <div id="adminBookingsTable" class="t-body"></div>
+            </div>
+
+            <div class="section-card" id="blockDatesCard">
+              <button class="section-toggle" id="blockDatesToggle" type="button" aria-expanded="false" aria-controls="blockDatesBody">
+                <span>Bloquear datas</span>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <div class="collapse" id="blockDatesBody" aria-hidden="true">
+                <div class="form2">
+                  <label class="field">
+                    <span>Data</span>
+                    <input id="blockDate" type="date" />
+                  </label>
+                  <button class="btn" id="blockDateBtn">BLOQUEAR DIA</button>
+                </div>
+
+                <div class="form2">
+                  <div class="field span-all">
+                    <span>Bloqueios recorrentes (dias da semana)</span>
+                    <div class="weekday-grid">
+                      <label class="checkline">
+                        <input class="block-weekday" type="checkbox" data-day="0" />
+                        <span>Dom</span>
+                      </label>
+                      <label class="checkline">
+                        <input class="block-weekday" type="checkbox" data-day="1" />
+                        <span>Seg</span>
+                      </label>
+                      <label class="checkline">
+                        <input class="block-weekday" type="checkbox" data-day="2" />
+                        <span>Ter</span>
+                      </label>
+                      <label class="checkline">
+                        <input class="block-weekday" type="checkbox" data-day="3" />
+                        <span>Qua</span>
+                      </label>
+                      <label class="checkline">
+                        <input class="block-weekday" type="checkbox" data-day="4" />
+                        <span>Qui</span>
+                      </label>
+                      <label class="checkline">
+                        <input class="block-weekday" type="checkbox" data-day="5" />
+                        <span>Sex</span>
+                      </label>
+                      <label class="checkline">
+                        <input class="block-weekday" type="checkbox" data-day="6" />
+                        <span>Sáb</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="table cols-3">
+                  <div class="t-head">
+                    <span>Data</span><span>Status</span><span>Ações</span>
+                  </div>
+                  <div id="blockedDatesTable" class="t-body"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card" id="blockSlotsCard">
+              <button class="section-toggle" id="blockSlotsToggle" type="button" aria-expanded="false" aria-controls="blockSlotsBody">
+                <span>Bloquear horários</span>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <div class="collapse" id="blockSlotsBody" aria-hidden="true">
+                <div class="form-sub">
+                  <label class="field">
+                    <span>Data</span>
+                    <input id="blockSlotDate" type="date" />
+                  </label>
+                  <label class="field">
+                    <span>Horário</span>
+                    <select id="blockSlotTime"></select>
+                  </label>
+                  <button class="btn" id="blockSlotBtn">BLOQUEAR HORÁRIO</button>
+                </div>
+
+                <div class="table cols-4">
+                  <div class="t-head">
+                    <span>Data</span><span>Hora</span><span>Status</span><span>Ações</span>
+                  </div>
+                  <div id="blockedSlotsTable" class="t-body"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card" id="blockWeekdaySlotsCard">
+              <button class="section-toggle" id="blockWeekdaySlotsToggle" type="button" aria-expanded="false" aria-controls="blockWeekdaySlotsBody">
+                <span>Bloquear horários recorrentes (semanal)</span>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <div class="collapse" id="blockWeekdaySlotsBody" aria-hidden="true">
+                <div class="form-sub">
+                  <label class="field">
+                    <span>Dia da Semana</span>
+                    <select id="blockWeekdaySlotDay">
+                      <option value="0">Domingo</option>
+                      <option value="1">Segunda</option>
+                      <option value="2">Terça</option>
+                      <option value="3">Quarta</option>
+                      <option value="4">Quinta</option>
+                      <option value="5">Sexta</option>
+                      <option value="6">Sábado</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Horário</span>
+                    <select id="blockWeekdaySlotTime"></select>
+                  </label>
+                  <button class="btn" id="blockWeekdaySlotBtn">BLOQUEAR RECORRENTE</button>
+                </div>
+
+                <div class="table cols-4">
+                  <div class="t-head">
+                    <span>Dia</span><span>Hora</span><span>Status</span><span>Ações</span>
+                  </div>
+                  <div id="blockedWeekdaySlotsTable" class="t-body"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card" id="scheduleCard">
+              <button class="section-toggle" id="scheduleToggle" type="button" aria-expanded="false" aria-controls="scheduleBody">
+                <span>Horários disponíveis</span>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <div class="collapse" id="scheduleBody" aria-hidden="true">
+                <div class="form3 schedule-form">
+                  <label class="field">
+                    <span>Manhã (início)</span>
+                    <input id="scheduleMorningStart" type="time" />
+                  </label>
+                  <label class="field">
+                    <span>Manhã (fim)</span>
+                    <input id="scheduleMorningEnd" type="time" />
+                  </label>
+                  <label class="field">
+                    <span>Tarde (início)</span>
+                    <input id="scheduleAfternoonStart" type="time" />
+                  </label>
+                  <label class="field">
+                    <span>Tarde (fim)</span>
+                    <input id="scheduleAfternoonEnd" type="time" />
+                  </label>
+                  <label class="field">
+                    <span>Tempo de Corte (min)</span>
+                    <input id="scheduleDuration" type="number" min="10" step="5" placeholder="Ex: 40" />
+                  </label>
+                  <label class="field">
+                    <span>Intervalo de Pausa (min)</span>
+                    <input id="scheduleGap" type="number" min="0" step="5" placeholder="Ex: 10" />
+                  </label>
+                  <button class="btn" id="scheduleSaveBtn" style="grid-column: 1 / -1;">SALVAR HORÁRIOS</button>
+                </div>
+                <p class="tiny muted" id="scheduleMsg"></p>
+                <p class="tiny muted">Dica: deixe os campos da tarde em branco para usar só uma faixa.</p>
+              </div>
+            </div>
+
+            <div class="section-card" id="bookingWindowCard">
+              <button class="section-toggle" id="bookingWindowToggle" type="button" aria-expanded="false" aria-controls="bookingWindowBody">
+                <span>Limite de dias para agendamento</span>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <div class="collapse" id="bookingWindowBody" aria-hidden="true">
+                <div class="form2">
+                  <label class="field">
+                    <span>Dias para frente</span>
+                    <input id="bookingWindowDays" type="number" min="1" max="365" step="1" placeholder="Ex: 10" />
+                  </label>
+                  <button class="btn" id="bookingWindowSaveBtn">SALVAR LIMITE</button>
+                </div>
+                <p class="tiny muted" id="bookingWindowMsg"></p>
+              </div>
+            </div>
+
+            <div class="section-card" id="bookingGraceCard">
+              <button class="section-toggle" id="bookingGraceToggle" type="button" aria-expanded="false" aria-controls="bookingGraceBody">
+                <span>Bloquear horário após</span>
+                <span class="chev" aria-hidden="true"></span>
+              </button>
+              <div class="collapse" id="bookingGraceBody" aria-hidden="true">
+                <div class="form2">
+                  <label class="field">
+                    <span>Minutos</span>
+                    <input id="bookingGraceMinutes" type="number" min="0" max="240" step="1" placeholder="Ex: 20" />
+                  </label>
+                  <button class="btn" id="bookingGraceSaveBtn">SALVAR INTERVALO</button>
+                </div>
+                <p class="tiny muted" id="bookingGraceMsg"></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="admin-panel" id="admin_assinantes">
+            <h4>Assinantes</h4>
+            <p class="muted">Cadastre clientes assinantes e controle cortes disponíveis no mês.</p>
+
+            <div class="form3">
+              <label class="field">
+                <span>Nome</span>
+                <input id="subName" type="text" placeholder="Nome do assinante" maxlength="50" />
+              </label>
+              <label class="field">
+                <span>WhatsApp</span>
+                <input id="subPhone" type="tel" inputmode="numeric" pattern="[0-9]*" autocomplete="tel" placeholder="(00) 00000-0000" maxlength="20" />
+              </label>
+              <label class="field">
+                <span>Plano</span>
+                <select id="subPlan"></select>
+              </label>
+              <label class="field">
+                <span>Cortes/mês</span>
+                <input id="subTotalCuts" type="number" min="1" step="1" placeholder="Ex: 4" />
+              </label>
+              <button class="btn primary" id="addSubscriberBtn">ADICIONAR</button>
+            </div>
+
+            <label class="field">
+              <span>Descrição / Observações</span>
+              <textarea id="subNotes" rows="3" placeholder="Ex: Plano inclui barba, fidelidade até 08/2026..."></textarea>
+            </label>
+
+            <div class="actions">
+              <button class="btn" id="resetSubscriberCutsBtn">REINICIAR CORTES DO MÊS (TODOS)</button>
+            </div>
+
+            <div class="table cols-6 scroll">
+              <div class="t-head">
+                <span>Nome</span><span>Plano</span><span>Cortes</span><span>Contato</span><span>Obs.</span><span>Ações</span>
+              </div>
+              <div id="subscribersTable" class="t-body"></div>
+            </div>
+            <p class="tiny muted">Dica: clique em Editar para mudar dados do assinante e descrição.</p>
+          </div>
+
+          <div class="admin-panel" id="admin_planos">
+            <h4>Planos</h4>
+            <p class="muted">Edite preços, itens e descrições dos planos exibidos no site.</p>
+
+            <div class="form-plan">
+              <label class="field">
+                <span>Nome do plano</span>
+                <input id="planName" type="text" placeholder="Ex: Plano Básico" maxlength="50" />
+              </label>
+              <label class="field">
+                <span>Preço (R$)</span>
+                <input id="planPrice" type="number" min="0" step="0.01" placeholder="Ex: 79.90" />
+              </label>
+              <label class="field">
+                <span>Período</span>
+                <select id="planPeriod">
+                  <option value="mês">mês</option>
+                  <option value="trimestre">trimestre</option>
+                  <option value="semestre">semestre</option>
+                  <option value="ano">ano</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Badge (opcional)</span>
+                <input id="planBadge" type="text" placeholder="Ex: Mais vendido" />
+              </label>
+              <label class="field">
+                <span>Link de pagamento (opcional)</span>
+                <input id="planPaymentLink" type="url" placeholder="https://seu-link.com/checkout" />
+              </label>
+              <label class="field">
+                <span>Destaque</span>
+                <select id="planFeatured">
+                  <option value="0">Não</option>
+                  <option value="1">Sim</option>
+                </select>
+              </label>
+              <button class="btn primary" id="addPlanBtn">ADICIONAR</button>
+            </div>
+
+              <label class="field">
+                <span>Itens do plano (1 por linha)</span>
+                <textarea id="planItems" rows="4" placeholder="Ex: 2 cortes por mês&#10;Agendamento prioritário"></textarea>
+              </label>
+
+              <label class="field">
+                <span>Descrição curta (opcional)</span>
+                <textarea id="planDesc" rows="2" placeholder="Ex: Ideal para quem corta 2x no mês."></textarea>
+              </label>
+
+            <div class="table cols-5 scroll">
+              <div class="t-head">
+                <span>Plano</span><span>Preço</span><span>Itens</span><span>Badge</span><span>Ações</span>
+              </div>
+              <div id="plansTable" class="t-body"></div>
+            </div>
+          </div>
+
+          <div class="admin-panel" id="admin_finance">
+            <h4>Controle de Caixa</h4>
+            <p class="muted">Registre entradas e gastos. O sistema separa por mês e cria um novo mês automaticamente.</p>
+
+            <div class="finance-top">
+              <label class="field">
+                <span>Mês</span>
+                <select id="financeMonth"></select>
+              </label>
+              <button class="btn" id="financeNextMonthBtn">CRIAR PRÓXIMO MÊS</button>
+            </div>
+
+            <div class="form-finance">
+              <label class="field">
+                <span>Tipo</span>
+                <select id="finType">
+                  <option value="entrada">Entrada</option>
+                  <option value="saida">Saída</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Categoria</span>
+                <input id="finCategory" type="text" placeholder="Ex: Produto, Aluguel" />
+              </label>
+              <label class="field">
+                <span>Descrição</span>
+                <input id="finDesc" type="text" placeholder="Ex: Corte do dia, Luz" />
+              </label>
+              <label class="field">
+                <span>Valor (R$)</span>
+                <input id="finAmount" type="number" min="0" step="0.01" placeholder="0.00" />
+              </label>
+              <label class="field">
+                <span>Data</span>
+                <input id="finDate" type="date" />
+              </label>
+              <button class="btn primary" id="addFinanceBtn">LANÇAR</button>
+            </div>
+
+            <div class="box mini">
+              <div class="result-line">
+                <span>Total de entradas:</span>
+                <b id="finTotalIn">R$ 0,00</b>
+              </div>
+              <div class="result-line">
+                <span>Total de saídas:</span>
+                <b id="finTotalOut">R$ 0,00</b>
+              </div>
+              <div class="result-line">
+                <span>Saldo do mês:</span>
+                <b id="finNet">R$ 0,00</b>
+              </div>
+            </div>
+
+            <div class="table cols-6 scroll">
+              <div class="t-head">
+                <span>Data</span><span>Tipo</span><span>Categoria</span><span>Descrição</span><span>Valor</span><span>Ações</span>
+              </div>
+              <div id="financeTable" class="t-body"></div>
+            </div>
+
+            <h5>Relatório do mês</h5>
+            <div class="report-actions">
+              <button class="btn" id="financeReportBtn">GERAR RELATÓRIO</button>
+              <button class="btn" id="financeCopyReportBtn">COPIAR</button>
+            </div>
+            <textarea id="financeReportText" class="report-text" rows="8" readonly></textarea>
+          </div>
+      </div>
+    </div>
+    </section>
+  </main>
+
+  <!-- Modal login -->
+  <div class="modal" id="loginModal" aria-hidden="true">
+    <div class="modal-backdrop" data-close="1"></div>
+
+    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Login do admin">
+      <h3>Área do Admin</h3>
+      <p class="muted">Digite a senha para acessar o painel.</p>
+
+      <label class="field">
+        <span>Senha</span>
+        <input id="adminPass" type="password" placeholder="••••••••" />
+      </label>
+
+      <div class="modal-actions">
+        <button class="btn" data-close="1">CANCELAR</button>
+        <button class="btn primary" id="loginBtn">ENTRAR</button>
+      </div>
+
+      <p class="tiny muted" id="loginMsg"></p>
+    </div>
+  </div>
+
+    <script src="script.js?v=20260401v5"></script>
+  </body>
+</html>
