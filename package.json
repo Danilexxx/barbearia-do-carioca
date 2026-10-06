@@ -1,0 +1,8 @@
+{
+  "name": "barbearia-do-carioca",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check script.js && node --check functions/api/[[path]].js"
+  }
+}
