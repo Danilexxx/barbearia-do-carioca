@@ -121,6 +121,19 @@ navButtons.forEach(btn => {
 const gearBtn = $("#gearBtn");
 const adminEntryBtn = $("#adminEntryBtn");
 const adminLogo = $("#adminLogo");
+if (adminLogo) {
+  adminLogo.setAttribute("role", "link");
+  adminLogo.setAttribute("tabindex", "0");
+  adminLogo.setAttribute("aria-label", "Abrir painel administrativo");
+  const openPanel = () => { window.location.assign("/painel/"); };
+  adminLogo.addEventListener("click", openPanel);
+  adminLogo.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openPanel();
+    }
+  });
+}
 
 const loginModal = $("#loginModal");
 const adminPass = $("#adminPass");
