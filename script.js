@@ -372,6 +372,10 @@ function formatPhoneBR(value) {
   return `(${ddd}) ${rest.slice(0, 5)}-${rest.slice(5, 9)}`;
 }
 
+function normalizePhoneDigits(value) {
+  return String(value || "").replace(/\D/g, "").slice(-11);
+}
+
 document.addEventListener("input", (e) => {
   const target = e.target;
   if (!(target instanceof HTMLInputElement)) return;
@@ -2644,6 +2648,7 @@ if (bookBtn) {
 
     const selects = bookServicesList ? Array.from(bookServicesList.querySelectorAll('.bookServiceSelect')) : [];
     const chosenServices = selects.map(s => s.value).filter(Boolean);
+    const subscriber = subscribers.find(s => normalizePhoneDigits(s.phone) === normalizePhoneDigits(phone));
 
     if (!name || !phone || chosenServices.length === 0 || !date || !time) {
       setBookMsg("Preencha todos os campos e selecione ao menos um serviço.");
@@ -2664,6 +2669,10 @@ if (bookBtn) {
     }
     if (isSlotBlocked(date, time) || isSlotBooked(date, time)) {
       setBookMsg("Esse horário já está ocupado.");
+      return;
+    }
+    if (subscriber && Number(subscriber.remainingCuts) <= 0) {
+      setBookMsg("Seu plano não possui mais cortes disponíveis neste mês. Escolha o pagamento avulso.");
       return;
     }
 
@@ -2708,6 +2717,7 @@ if (bookBtn) {
       if (r && r.error === "SLOT_TAKEN") setBookMsg("Esse horário já está ocupado.");
       else if (r && r.error === "BLOCKED") setBookMsg("Esse horário/data está bloqueado.");
       else if (r && r.error === "MINIMUM_LEAD_TIME") setBookMsg("Escolha um horário com pelo menos 24 horas de antecedência.");
+      else if (r && r.error === "SUBSCRIPTION_EXHAUSTED") setBookMsg("Seu plano não possui mais cortes disponíveis neste mês. Escolha o pagamento avulso.");
       else setBookMsg("Não foi possível confirmar. Tente novamente.");
       const snap = await apiFetchJson("/bookings.php?action=snapshot").catch(() => null);
       if (snap && snap.ok && snap.bookings) bookings = snap.bookings;
@@ -2720,6 +2730,11 @@ if (bookBtn) {
     }
 
     if (r.bookings) bookings = r.bookings;
+
+    if (subscriber && Number(subscriber.remainingCuts) > 0) {
+      subscriber.remainingCuts -= 1;
+      save(STORAGE_KEYS.subscribers, subscribers);
+    }
 
     if (bookName) bookName.value = "";
     if (bookPhone) bookPhone.value = "";

@@ -122,6 +122,36 @@ function hasMinimumLeadTime(date, time, hours = 24) {
   return appointment.getTime() >= Date.now() + hours * 60 * 60 * 1000;
 }
 
+function phoneDigits(value) {
+  return String(value || "").replace(/\D/g, "").slice(-11);
+}
+
+async function findSubscriber(db, phone) {
+  const row = await db.prepare("SELECT json_value FROM app_state WHERE state_key = 'subscribers'").first();
+  if (!row) return null;
+  try {
+    const list = JSON.parse(row.json_value);
+    if (!Array.isArray(list)) return null;
+    return list.find(item => phoneDigits(item.phone) === phoneDigits(phone)) || null;
+  } catch {
+    return null;
+  }
+}
+
+async function consumeSubscriber(db, phone) {
+  const row = await db.prepare("SELECT json_value FROM app_state WHERE state_key = 'subscribers'").first();
+  if (!row) return;
+  try {
+    const list = JSON.parse(row.json_value);
+    if (!Array.isArray(list)) return;
+    const updated = list.map(item => phoneDigits(item.phone) === phoneDigits(phone)
+      ? { ...item, remainingCuts: Math.max(0, Number(item.remainingCuts || 0) - 1) }
+      : item);
+    await db.prepare(`UPDATE app_state SET json_value = ?, updated_at = datetime('now') WHERE state_key = 'subscribers'`)
+      .bind(JSON.stringify(updated)).run();
+  } catch { /* estado inválido não deve interromper o agendamento */ }
+}
+
 async function snapshot(db) {
   const [bookingResult, blockResult] = await db.batch([
     db.prepare(`SELECT id, date, time, name, phone, service_name AS serviceName,
@@ -267,6 +297,10 @@ async function handleBookings(context, action) {
     if (!hasMinimumLeadTime(booking.date, booking.time, 24)) {
       return json({ ok: false, error: "MINIMUM_LEAD_TIME", minimumHours: 24 }, 422);
     }
+    const subscriber = await findSubscriber(env.DB, booking.phone);
+    if (subscriber && Number(subscriber.remainingCuts || 0) <= 0) {
+      return json({ ok: false, error: "SUBSCRIPTION_EXHAUSTED" }, 402);
+    }
     const weekday = new Date(`${booking.date}T12:00:00Z`).getUTCDay();
     const blocked = await env.DB.prepare(`SELECT 1 FROM booking_blocks
       WHERE (block_type = 'date' AND date = ?)
@@ -280,6 +314,7 @@ async function handleBookings(context, action) {
         VALUES (?, ?, ?, ?, ?, ?, ?)`)
         .bind(booking.id, booking.date, booking.time, booking.name, booking.phone,
           booking.serviceName, booking.servicePrice).run();
+      if (subscriber) await consumeSubscriber(env.DB, booking.phone);
     } catch {
       return json({ ok: false, error: "SLOT_TAKEN" }, 409);
     }
