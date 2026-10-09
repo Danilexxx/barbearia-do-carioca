@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Painel seguro | Barbearia do Carioca</title>
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body class="admin-login-page">
+    <main class="admin-login-shell">
+      <section class="box admin-login-card" aria-labelledby="adminLoginTitle">
+        <img src="../download-removebg-preview.png" alt="Barbearia do Carioca" class="admin-login-logo" />
+        <p class="eyebrow">BARBEARIA DO CARIOCA</p>
+        <h1 id="adminLoginTitle">Acesso administrativo</h1>
+        <p class="muted">Área restrita. Entre com a senha administrativa para continuar.</p>
+        <form id="adminLoginForm" autocomplete="on">
+          <label class="field">
+            <span>Senha</span>
+            <input id="adminPassword" name="password" type="password" autocomplete="current-password" required autofocus />
+          </label>
+          <button class="btn primary" type="submit">ENTRAR NO PAINEL</button>
+          <p class="tiny muted" id="adminLoginMessage" role="status"></p>
+        </form>
+        <a class="admin-back-link" href="../">Voltar para o site</a>
+      </section>
+    </main>
+    <script src="./painel.js" defer></script>
+  </body>
+</html>

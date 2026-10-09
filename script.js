@@ -237,7 +237,7 @@ logoutBtn.addEventListener("click", async () => {
 
 // O painel tem uma entrada explícita e previsível para o proprietário.
 // A URL não substitui o login: ela apenas abre o modal de autenticação.
-if (/^\/painel\/?$/.test(window.location.pathname)) {
+if (/^\/painel\/?$/.test(window.location.pathname) || new URLSearchParams(window.location.search).get("admin") === "1") {
   setTimeout(() => openAdminEntry(), 0);
 }
 
