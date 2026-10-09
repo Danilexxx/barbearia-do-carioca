@@ -121,11 +121,6 @@ navButtons.forEach(btn => {
 const gearBtn = $("#gearBtn");
 const adminEntryBtn = $("#adminEntryBtn");
 const adminLogo = $("#adminLogo");
-if (adminLogo) {
-  adminLogo.addEventListener("contextmenu", (e) => e.preventDefault());
-  const img = adminLogo.querySelector("img");
-  if (img) img.addEventListener("contextmenu", (e) => e.preventDefault());
-}
 
 const loginModal = $("#loginModal");
 const adminPass = $("#adminPass");
@@ -151,13 +146,15 @@ function isAdminOpen() {
   return adminPanel && adminPanel.classList.contains("is-show");
 }
 
-function openAdminEntry() {
+async function openAdminEntry() {
   if (isAdminOpen()) {
     showTab("inicio");
     return;
   }
-  const logged = load(STORAGE_KEYS.admin, false);
-  if (logged) {
+  // O localStorage nunca concede acesso: somente a sessão HttpOnly do servidor.
+  const status = await apiFetchJson("/auth.php?action=status").catch(() => null);
+  if (status && status.logged) {
+    save(STORAGE_KEYS.admin, true);
     showAdmin();
   } else {
     openModal();
@@ -170,44 +167,6 @@ if (gearBtn) {
 
 if (adminEntryBtn) {
   adminEntryBtn.addEventListener("click", openAdminEntry);
-}
-
-if (adminLogo) {
-  let holdTimer = null;
-  let touchActive = false;
-
-  const startHold = () => {
-    if (holdTimer) return;
-    holdTimer = setTimeout(() => {
-      holdTimer = null;
-      openAdminEntry();
-    }, 1000);
-  };
-  const cancelHold = () => {
-    if (!holdTimer) return;
-    clearTimeout(holdTimer);
-    holdTimer = null;
-  };
-
-  adminLogo.addEventListener("mousedown", () => {
-    if (touchActive) return;
-    startHold();
-  });
-  adminLogo.addEventListener("mouseup", cancelHold);
-  adminLogo.addEventListener("mouseleave", cancelHold);
-  adminLogo.addEventListener("touchstart", () => {
-    touchActive = true;
-    startHold();
-  }, { passive: true });
-  adminLogo.addEventListener("touchend", () => {
-    touchActive = false;
-    cancelHold();
-  });
-  adminLogo.addEventListener("touchcancel", () => {
-    touchActive = false;
-    cancelHold();
-  });
-  adminLogo.addEventListener("touchmove", cancelHold, { passive: true });
 }
 
 loginModal.addEventListener("click", (e) => {
@@ -275,6 +234,12 @@ logoutBtn.addEventListener("click", async () => {
   save(STORAGE_KEYS.admin, false);
   showTab("inicio");
 });
+
+// O painel tem uma entrada explícita e previsível para o proprietário.
+// A URL não substitui o login: ela apenas abre o modal de autenticação.
+if (/^\/painel\/?$/.test(window.location.pathname)) {
+  setTimeout(() => openAdminEntry(), 0);
+}
 
 
 /* ================================

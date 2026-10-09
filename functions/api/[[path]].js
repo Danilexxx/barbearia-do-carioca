@@ -96,7 +96,22 @@ async function requireAdmin(request, env) {
 }
 
 function requirePost(request) {
-  return request.method === "POST" ? null : json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
+  if (request.method !== "POST") return json({ ok: false, error: "METHOD_NOT_ALLOWED" }, 405);
+  const contentType = request.headers.get("Content-Type") || "";
+  if (!/^application\/json(?:;|$)/i.test(contentType)) {
+    return json({ ok: false, error: "JSON_REQUIRED" }, 415);
+  }
+  const origin = request.headers.get("Origin");
+  if (origin) {
+    try {
+      if (new URL(origin).origin !== new URL(request.url).origin) {
+        return json({ ok: false, error: "BAD_ORIGIN" }, 403);
+      }
+    } catch {
+      return json({ ok: false, error: "BAD_ORIGIN" }, 403);
+    }
+  }
+  return null;
 }
 
 async function snapshot(db) {
@@ -135,6 +150,8 @@ async function handleAuth(context, action) {
   const { request, env } = context;
   if (action === "status") return json({ ok: true, logged: await isAdmin(request, env) });
   if (action === "logout") {
+    const methodError = requirePost(request);
+    if (methodError) return methodError;
     return json({ ok: true }, 200, {
       "Set-Cookie": "bdc_session=; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=0"
     });
