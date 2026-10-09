@@ -109,6 +109,7 @@
                 </div>
               </div>
               <button class="btn small" type="button" id="addBookServiceBtn" style="margin-top: 5px; width: fit-content;">+ Adicionar outro serviço</button>
+              <div id="bookingSummary" class="booking-summary" aria-live="polite">Selecione um serviço para ver o total.</div>
             </div>
             <div class="row">
               <label class="field">
@@ -427,6 +428,10 @@
               <label class="field">
                 <span>Preço (R$)</span>
                 <input id="sPrice" type="number" min="0" step="0.01" placeholder="Ex: 35.00" />
+              </label>
+              <label class="field">
+                <span>Duração (minutos)</span>
+                <input id="sDuration" type="number" min="5" step="5" placeholder="Ex: 40" />
               </label>
               <button class="btn primary" id="addServiceBtn">ADICIONAR</button>
             </div>

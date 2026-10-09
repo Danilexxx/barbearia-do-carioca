@@ -1097,3 +1097,17 @@ body, button, input, select, textarea{
 .admin-login-card form{text-align:left;margin-top:22px}
 .admin-login-card form .btn{width:100%;margin-top:14px}
 .admin-back-link{display:inline-block;margin-top:20px;color:rgba(255,255,255,.72);font-size:14px}
+.booking-summary{margin-top:10px;padding:12px 14px;border:1px solid rgba(255,255,255,.16);border-radius:10px;background:rgba(255,255,255,.05);font-weight:700;font-size:14px}
+.admin-grid{align-items:stretch;gap:12px}
+.admin-card{min-height:92px;text-align:left;display:flex;align-items:center;gap:12px}
+.admin-panel h4{margin-top:0}
+@media (max-width:640px){
+  .admin-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .admin-card{min-height:82px;padding:12px 10px;display:block}
+  .admin-ico{margin-bottom:6px}
+  .admin-title{font-size:14px;line-height:1.15}
+  .admin-sub{font-size:11px;line-height:1.2;margin-top:4px}
+  .admin-top{gap:10px}
+  .form2{grid-template-columns:1fr}
+  .booking-summary{font-size:13px}
+}

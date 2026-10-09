@@ -114,6 +114,14 @@ function requirePost(request) {
   return null;
 }
 
+function hasMinimumLeadTime(date, time, hours = 24) {
+  const [year, month, day] = String(date).split("-").map(Number);
+  const [hour, minute] = String(time).split(":").map(Number);
+  if (![year, month, day, hour, minute].every(Number.isFinite)) return false;
+  const appointment = new Date(year, month - 1, day, hour, minute, 0, 0);
+  return appointment.getTime() >= Date.now() + hours * 60 * 60 * 1000;
+}
+
 async function snapshot(db) {
   const [bookingResult, blockResult] = await db.batch([
     db.prepare(`SELECT id, date, time, name, phone, service_name AS serviceName,
@@ -255,6 +263,9 @@ async function handleBookings(context, action) {
     }
     if (!/^\d{4}-\d{2}-\d{2}$/.test(booking.date) || !/^\d{2}:\d{2}$/.test(booking.time)) {
       return json({ ok: false, error: "BAD_DATE_OR_TIME" }, 400);
+    }
+    if (!hasMinimumLeadTime(booking.date, booking.time, 24)) {
+      return json({ ok: false, error: "MINIMUM_LEAD_TIME", minimumHours: 24 }, 422);
     }
     const weekday = new Date(`${booking.date}T12:00:00Z`).getUTCDay();
     const blocked = await env.DB.prepare(`SELECT 1 FROM booking_blocks

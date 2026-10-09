@@ -277,10 +277,11 @@ showAdminPanel("admin_clientes");
 let clients = load(STORAGE_KEYS.clients, []);
 let stock = load(STORAGE_KEYS.stock, []);
 let services = load(STORAGE_KEYS.services, [
-  { name: "Corte", price: 35.00 },
-  { name: "Barba", price: 30.00 },
-  { name: "Corte + Barba", price: 55.00 }
+  { name: "Corte", price: 35.00, duration: 40 },
+  { name: "Barba", price: 30.00, duration: 30 },
+  { name: "Corte + Barba", price: 55.00, duration: 70 }
 ]);
+services = (Array.isArray(services) ? services : []).map(s => ({ ...s, duration: Math.max(5, Number(s.duration) || 40) }));
 let gallery = load(STORAGE_KEYS.gallery, []);
 let barbers = load(STORAGE_KEYS.barbers, []);
 let cuts = load(STORAGE_KEYS.cuts, []);
@@ -396,7 +397,7 @@ function renderPrices() {
   services.forEach(s => {
     const row = document.createElement("div");
     row.className = "price-item";
-    row.innerHTML = `<span>${escapeHtml(s.name)}</span><b>${brl(Number(s.price) || 0)}</b>`;
+    row.innerHTML = `<span>${escapeHtml(s.name)} <small class="muted">(${Number(s.duration) || 40} min)</small></span><b>${brl(Number(s.price) || 0)}</b>`;
     pricesList.appendChild(row);
   });
 
@@ -405,7 +406,7 @@ function renderPrices() {
 
 function getServiceOptionsHtml() {
   if (!services.length) return `<option value="">Cadastre um serviço</option>`;
-  const options = services.map(s => `<option value="${escapeAttr(s.name)}">${escapeHtml(s.name)} - ${brl(Number(s.price) || 0)}</option>`).join("");
+  const options = services.map(s => `<option value="${escapeAttr(s.name)}">${escapeHtml(s.name)} - ${brl(Number(s.price) || 0)} (${Number(s.duration) || 40} min)</option>`).join("");
   return `<option value="" disabled selected hidden>Selecione um serviço</option>` + options;
 }
 
@@ -431,12 +432,31 @@ function refreshBookServicesSelects() {
     const exhausted = currentValues.length >= services.length;
     addBookServiceBtn.disabled = hasEmpty || exhausted;
   }
+  renderBookingSummary();
+}
+
+function selectedBookingServices() {
+  return bookServicesList
+    ? Array.from(bookServicesList.querySelectorAll('.bookServiceSelect')).map(s => s.value).filter(Boolean)
+    : [];
+}
+
+function renderBookingSummary() {
+  const target = $("#bookingSummary");
+  if (!target) return;
+  const selected = selectedBookingServices();
+  const chosen = selected.map(name => services.find(s => s.name === name)).filter(Boolean);
+  const total = chosen.reduce((sum, service) => sum + (Number(service.price) || 0), 0);
+  const duration = chosen.reduce((sum, service) => sum + (Number(service.duration) || 40), 0);
+  target.textContent = chosen.length ? `Total: ${brl(total)} · Duração estimada: ${duration} min` : "Selecione um serviço para ver o total.";
 }
 
 if (bookServicesList) {
   bookServicesList.addEventListener("change", (e) => {
     if (e.target.classList.contains("bookServiceSelect")) {
       refreshBookServicesSelects();
+      renderTimesSelect(bookDate ? bookDate.value : "");
+      renderSlots();
     }
   });
 }
@@ -871,7 +891,7 @@ function renderServicesAdmin() {
     row.className = "t-row";
     row.innerHTML = `
       <span>${escapeHtml(s.name)}</span>
-      <span>${brl(Number(s.price) || 0)}</span>
+      <span>${brl(Number(s.price) || 0)} · ${Number(s.duration) || 40} min</span>
       <span class="t-actions">
         <button class="icon-btn" data-del="${idx}">Excluir</button>
       </span>
@@ -891,11 +911,13 @@ renderServicesAdmin();
 $("#addServiceBtn").addEventListener("click", () => {
   const name = $("#sName").value.trim();
   const price = Number($("#sPrice").value);
+  const duration = Math.max(5, Number($("#sDuration").value) || 40);
   if (!name || Number.isNaN(price)) return;
 
-  services.unshift({ name, price });
+  services.unshift({ name, price, duration });
   $("#sName").value = "";
   $("#sPrice").value = "";
+  $("#sDuration").value = "";
   save(STORAGE_KEYS.services, services);
   renderServicesAdmin();
   renderPrices();
@@ -1988,9 +2010,51 @@ function isSlotBooked(dateStr, timeStr) {
   return bookings.items.some(b => b.date === dateStr && b.time === timeStr);
 }
 
+function getSelectedBookingDuration() {
+  return selectedBookingServices().reduce((sum, name) => {
+    const service = services.find(s => s.name === name);
+    return sum + (Number(service?.duration) || 40);
+  }, 0) || Number(schedule.duration) || 40;
+}
+
+function bookingLeadPassed(dateStr, timeStr) {
+  const [y, m, d] = String(dateStr).split("-").map(Number);
+  const [h, min] = String(timeStr).split(":").map(Number);
+  const appointment = new Date(y, (m || 1) - 1, d || 1, h || 0, min || 0, 0);
+  return appointment.getTime() >= Date.now() + (24 * 60 * 60 * 1000);
+}
+
+function bookingDurationFromName(serviceName) {
+  return String(serviceName || "").split(" + ").reduce((sum, name) => {
+    const service = services.find(s => s.name === name);
+    return sum + (Number(service?.duration) || Number(schedule.duration) || 40);
+  }, 0);
+}
+
+function overlapsBooking(dateStr, startMinutes, endMinutes) {
+  return bookings.items.some((booking) => {
+    if (booking.date !== dateStr) return false;
+    const start = timeToMinutes(booking.time);
+    const end = start + bookingDurationFromName(booking.serviceName);
+    return startMinutes < end && endMinutes > start;
+  });
+}
+
 function getAvailableTimes(dateStr) {
   if (!dateStr) return [];
-  return TIMES.filter(t => !isSlotBlocked(dateStr, t) && !isSlotBooked(dateStr, t) && !isPastTimeSlot(dateStr, t));
+  const duration = getSelectedBookingDuration();
+  const candidates = [];
+  for (const range of schedule.ranges) {
+    const start = timeToMinutes(range.start);
+    const end = timeToMinutes(range.end);
+    for (let cursor = start; cursor + duration <= end; cursor += 5) {
+      const time = minutesToTime(cursor);
+      if (!bookingLeadPassed(dateStr, time)) continue;
+      if (isSlotBlocked(dateStr, time) || overlapsBooking(dateStr, cursor, cursor + duration)) continue;
+      candidates.push(time);
+    }
+  }
+  return [...new Set(candidates)].sort((a, b) => timeToMinutes(a) - timeToMinutes(b));
 }
 
 function renderTimesSelect(dateStr) {
@@ -2039,18 +2103,15 @@ function renderSlots() {
     return;
   }
 
-  TIMES.forEach(t => {
-    const busy = isSlotBlocked(dateStr, t) || isSlotBooked(dateStr, t) || isPastTimeSlot(dateStr, t);
+  available.forEach(t => {
     const div = document.createElement("div");
-    div.className = "slot" + (busy ? " is-busy" : "");
+    div.className = "slot";
     div.textContent = t;
-    if (!busy) {
-      div.addEventListener("click", () => {
-        bookTime.value = t;
-        $$(".slot").forEach(s => s.style.outline = "none");
-        div.style.outline = "2px solid rgba(255,255,255,.7)";
-      });
-    }
+    div.addEventListener("click", () => {
+      bookTime.value = t;
+      $$(".slot").forEach(s => s.style.outline = "none");
+      div.style.outline = "2px solid rgba(255,255,255,.7)";
+    });
     slotsGrid.appendChild(div);
   });
 }
@@ -2593,6 +2654,10 @@ if (bookBtn) {
       setBookMsg("Data fora do prazo de agendamento.");
       return;
     }
+    if (!bookingLeadPassed(date, time)) {
+      setBookMsg("O agendamento precisa ter pelo menos 24 horas de antecedência.");
+      return;
+    }
     if (isDateBlocked(date)) {
       setBookMsg("Essa data está bloqueada. Escolha outra.");
       return;
@@ -2642,6 +2707,7 @@ if (bookBtn) {
     if (!r || !r.ok) {
       if (r && r.error === "SLOT_TAKEN") setBookMsg("Esse horário já está ocupado.");
       else if (r && r.error === "BLOCKED") setBookMsg("Esse horário/data está bloqueado.");
+      else if (r && r.error === "MINIMUM_LEAD_TIME") setBookMsg("Escolha um horário com pelo menos 24 horas de antecedência.");
       else setBookMsg("Não foi possível confirmar. Tente novamente.");
       const snap = await apiFetchJson("/bookings.php?action=snapshot").catch(() => null);
       if (snap && snap.ok && snap.bookings) bookings = snap.bookings;
