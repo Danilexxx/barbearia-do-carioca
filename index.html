@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
 
   <link rel="icon" type="image/png" href="download-removebg-preview.png" />
-  <link rel="stylesheet" href="style.css?v=20260226" />
+  <link rel="stylesheet" href="style.css?v=20261013a" />
 </head>
 <body>
   <!-- Topo -->
@@ -101,15 +101,19 @@
               <input id="bookPhone" type="tel" inputmode="numeric" pattern="[0-9]*" autocomplete="tel" placeholder="(00) 00000-0000" maxlength="20" />
             </label>
             <div class="field" id="bookServicesWrap">
-              <span>Serviços</span>
-              <div id="bookServicesList">
+              <div class="booking-services-heading">
+                <span>Escolha seus serviços</span>
+                <small>Toque para selecionar. Você pode escolher mais de um.</small>
+              </div>
+              <div id="bookingServicesGrid" class="booking-services-grid"></div>
+              <div id="bookServicesList" class="booking-services-state" aria-hidden="true">
                 <div class="book-service-row" style="display: flex; gap: 5px; margin-bottom: 5px;">
                   <select class="bookServiceSelect" style="flex: 1;"></select>
                   <button class="icon-btn remove-book-service-btn" type="button" style="display:none;" title="Remover"><i class="fa fa-trash"></i></button>
                 </div>
               </div>
-              <button class="btn small" type="button" id="addBookServiceBtn" style="margin-top: 5px; width: fit-content;">+ Adicionar outro serviço</button>
-              <div id="bookingSummary" class="booking-summary" aria-live="polite">Selecione um serviço para ver o total.</div>
+              <button class="btn small" type="button" id="addBookServiceBtn" hidden>+ Adicionar outro serviço</button>
+              <div id="bookingSummary" class="booking-summary is-empty" aria-live="polite">Selecione um serviço para montar seu atendimento.</div>
             </div>
             <div class="row">
               <label class="field">
@@ -893,6 +897,6 @@
     </div>
   </div>
 
-    <script src="script.js?v=20260401v5"></script>
+    <script src="script.js?v=20261013a"></script>
   </body>
 </html>

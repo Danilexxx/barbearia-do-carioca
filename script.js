@@ -390,6 +390,7 @@ const pricesList = $("#pricesList");
 const pricesEmpty = $("#pricesEmpty");
 const bookServicesList = $("#bookServicesList");
 const addBookServiceBtn = $("#addBookServiceBtn");
+const bookingServicesGrid = $("#bookingServicesGrid");
 
 function renderPrices() {
   pricesList.innerHTML = "";
@@ -436,6 +437,7 @@ function refreshBookServicesSelects() {
     const exhausted = currentValues.length >= services.length;
     addBookServiceBtn.disabled = hasEmpty || exhausted;
   }
+  renderBookingServiceCards();
   renderBookingSummary();
 }
 
@@ -452,7 +454,48 @@ function renderBookingSummary() {
   const chosen = selected.map(name => services.find(s => s.name === name)).filter(Boolean);
   const total = chosen.reduce((sum, service) => sum + (Number(service.price) || 0), 0);
   const duration = chosen.reduce((sum, service) => sum + (Number(service.duration) || 40), 0);
-  target.textContent = chosen.length ? `Total: ${brl(total)} · Duração estimada: ${duration} min` : "Selecione um serviço para ver o total.";
+  target.classList.toggle("is-empty", !chosen.length);
+  target.innerHTML = chosen.length
+    ? `<span><small>Total</small><b>${brl(total)}</b></span><span><small>Tempo</small><b>${duration} min</b></span>`
+    : `<span class="booking-summary-empty">Selecione um serviço para montar seu atendimento.</span>`;
+}
+
+function renderBookingServiceCards() {
+  if (!bookingServicesGrid) return;
+  const selected = selectedBookingServices();
+  bookingServicesGrid.innerHTML = "";
+
+  services.forEach((service) => {
+    const active = selected.includes(service.name);
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = `booking-service-card${active ? " is-selected" : ""}`;
+    card.setAttribute("aria-pressed", String(active));
+    card.innerHTML = `<span class="service-check" aria-hidden="true">${active ? "✓" : "+"}</span><span class="service-card-copy"><b>${escapeHtml(service.name)}</b><small>${Number(service.duration) || 40} min</small></span><strong>${brl(Number(service.price) || 0)}</strong>`;
+
+    card.addEventListener("click", () => {
+      const rows = Array.from(bookServicesList.querySelectorAll(".book-service-row"));
+      const existing = rows.find(row => row.querySelector("select")?.value === service.name);
+
+      if (existing) {
+        if (rows.length === 1) existing.querySelector("select").value = "";
+        else existing.remove();
+      } else {
+        let select = rows.map(row => row.querySelector("select")).find(item => item && !item.value);
+        if (!select) {
+          addBookServiceBtn.click();
+          select = Array.from(bookServicesList.querySelectorAll(".bookServiceSelect")).at(-1);
+        }
+        if (select) select.value = service.name;
+      }
+
+      refreshBookServicesSelects();
+      renderTimesSelect(bookDate ? bookDate.value : "");
+      renderSlots();
+    });
+
+    bookingServicesGrid.appendChild(card);
+  });
 }
 
 if (bookServicesList) {
@@ -2743,6 +2786,7 @@ if (bookBtn) {
       for (let i = 1; i < rows.length; i++) rows[i].remove();
       const firstSelect = bookServicesList.querySelector('.bookServiceSelect');
       if (firstSelect && firstSelect.options.length > 0) firstSelect.selectedIndex = 0;
+      refreshBookServicesSelects();
     }
     setBookMsg("Agendamento confirmado! Você receberá confirmação no WhatsApp.");
 
